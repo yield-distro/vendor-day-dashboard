@@ -1607,11 +1607,15 @@ function fmtTime(t){
 // (a brand going over budget in one month doesn't create debt against other months).
 // Computed against the real current date so it stays consistent regardless of which
 // month the tracker is navigated to.
+// Backlog tracking begins August 2026 — no leftover entitlement is counted for
+// any month before this, regardless of the 120-day window below.
+var BACKLOG_START=new Date(2026,7,1);
 function computeBacklogDays(brandKey){
   var today=new Date();
   var totalDays=0;
   for(var i=1;i<=5;i++){
     var d=new Date(today.getFullYear(),today.getMonth()-i,1);
+    if(d<BACKLOG_START)continue;
     var daysSince=Math.floor((today-d)/86400000);
     if(daysSince>120)continue;
     var label=fmtMonthLabel(d);
