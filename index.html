@@ -224,6 +224,27 @@ body{font-family:'Raleway',-apple-system,sans-serif;background:#F2F2F2;color:#1a
 .bp-budget-flag.flag-good{background:#d4edda;color:#1a5e2a;}
 .bp-vday-count{font-size:10px;color:#7F381D;font-weight:700;margin-left:2px;}
 .bp-backlog-badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600;background:#e6eefc;color:#1a4d8f;margin-left:4px;width:100%;margin-top:4px;}
+.bp-dbar-bg{height:6px;background:#F2F2F2;border-radius:4px;overflow:hidden;width:100%;margin-top:6px;}
+.bp-dbar-fill{height:100%;border-radius:4px;transition:width .4s;}
+.bp-dbar-fill.over{background:#2a6644;}
+.bp-dbar-fill.close{background:#C19870;}
+.bp-dbar-fill.behind{background:#7F381D;}
+.bp-dbar-label{font-size:9px;color:#aaa;margin-top:3px;font-weight:600;}
+
+/* Always-visible budget-to-goal summary banner (shown across every tab) */
+.budget-banner{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E6DED1;border-radius:10px;padding:10px 14px;margin-bottom:20px;}
+.budget-banner-label{font-size:10px;font-weight:700;color:#C19870;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;flex-shrink:0;}
+.budget-banner-strip{display:flex;gap:8px;overflow-x:auto;flex:1;padding-bottom:2px;}
+.budget-banner-strip::-webkit-scrollbar{height:5px;}
+.budget-banner-strip::-webkit-scrollbar-thumb{background:#E6DED1;border-radius:3px;}
+.bb-pill{display:flex;align-items:center;gap:6px;background:#F9F7F4;border:1px solid #E6DED1;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;color:#253022;white-space:nowrap;cursor:pointer;flex-shrink:0;transition:box-shadow .15s;}
+.bb-pill:hover{box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.bb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.bb-dot.over{background:#2a6644;}
+.bb-dot.close{background:#C19870;}
+.bb-dot.behind{background:#7F381D;}
+.bb-dot.none{background:#ddd;}
+.bb-pct{font-size:10px;color:#999;font-weight:600;}
 .tracker-section-title{font-size:13px;font-weight:700;color:#253022;margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px;}
 .btn-export{padding:6px 14px;background:#253022;color:#E6DED1;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.3px;}
 .btn-export:hover{background:#3a4a36;}
@@ -351,6 +372,11 @@ body{font-family:'Raleway',-apple-system,sans-serif;background:#F2F2F2;color:#1a
   <button class="tab-btn" onclick="showTab('calendar',this)">&#128197; Calendar</button>
 <button class="btn-recent" id="btn-recent" onclick="toggleRecent()" title="Toggle: show only brands ordered in last 90 days" style="margin-left:4px;"><span class="dot"></span>90-Day Brands</button>
   <button class="sync-btn" id="sync-btn" onclick="openSyncPanel()">&#9729; Sync</button>
+</div>
+
+<div class="budget-banner" id="budget-banner" style="display:none;">
+  <span class="budget-banner-label">Brands vs. Budget<br>(this month)</span>
+  <div class="budget-banner-strip" id="budget-banner-strip"></div>
 </div>
 
 <!-- Retailer View -->
@@ -1360,6 +1386,7 @@ var allReps=[...new Set(DATA.map(function(d){return d.rep;}))].sort();
 var rfEl=document.getElementById('rf');
 allReps.forEach(function(r){var o=document.createElement('option');o.value=r;o.textContent=r;rfEl.appendChild(o);});
 document.getElementById('total-ct').textContent=DATA.length;
+renderBudgetSummaryBanner();
 
 function getFiltered(){
   var q=(document.getElementById('q').value||'').toLowerCase();
@@ -1632,6 +1659,45 @@ function computeBacklogDays(brandKey){
   return {days:totalDays,dollars:totalDays*140};
 }
 
+// Always-visible strip (shown on every tab) summarizing each brand's vendor-day
+// coverage against its current-month HubSpot budget, worst-first so the team
+// can spot gaps without opening Brand Budgets.
+function renderBudgetSummaryBanner(){
+  var strip=document.getElementById('budget-banner-strip');
+  var banner=document.getElementById('budget-banner');
+  if(!strip||!banner)return;
+  var now=new Date();
+  var label=fmtMonthLabel(now);
+  var mk=monthKey(now);
+  var monthBudgets=BRAND_BUDGETS_BY_MONTH[label]||{};
+  var evts=loadEvents().filter(function(e){return e.month===mk;});
+  var rows=BRAND_MINS.map(function(b){
+    var bdata=monthBudgets[b.key];
+    var booked=evts.filter(function(e){return e.brands.indexOf(b.key)!==-1;}).length;
+    if(!bdata||!bdata.budget){
+      return {name:b.name,key:b.key,cls:'none',pct:null,booked:booked,entitled:0};
+    }
+    var entitled=Math.floor(bdata.budget/140);
+    var pct=entitled>0?Math.round(booked/entitled*100):0;
+    var cls=pct>=100?'over':pct>=50?'close':'behind';
+    return {name:b.name,key:b.key,cls:cls,pct:pct,booked:booked,entitled:entitled};
+  });
+  // Worst-first: brands with a budget set and lowest coverage % lead; brands
+  // with no HubSpot budget set trail at the end.
+  rows.sort(function(a,c){
+    if(a.pct===null&&c.pct===null)return 0;
+    if(a.pct===null)return 1;
+    if(c.pct===null)return -1;
+    return a.pct-c.pct;
+  });
+  banner.style.display=rows.length?'flex':'none';
+  strip.innerHTML=rows.map(function(r){
+    var label=r.pct===null?'no budget set':(r.booked+'/'+r.entitled+' days');
+    var pctLabel=r.pct===null?'':'<span class="bb-pct">'+r.pct+'%</span>';
+    return '<span class="bb-pill" onclick="showTab(\'budgets\',document.querySelector(&quot;.tab-btn:nth-child(4)&quot;))" title="'+r.name+': '+label+'"><span class="bb-dot '+r.cls+'"></span>'+r.name+'&nbsp;&middot;&nbsp;'+label+' '+pctLabel+'</span>';
+  }).join('');
+}
+
 function renderTracker(){
   var mk=monthKey(trackerDate);
   document.getElementById('tracker-month-label').textContent=fmtMonthLabel(trackerDate);
@@ -1680,8 +1746,12 @@ function renderTracker(){
     var vdaysHtml=bdata.budget>0?'<span class="bp-vday-count">= '+entitledVdays+' vendor day'+(entitledVdays!==1?'s':'')+' ($140/day)</span>':'';
     var backlogInfo=computeBacklogDays(b.key);
     var backlogHtml=backlogInfo.days>0?'<span class="bp-backlog-badge">&#8593; +'+backlogInfo.days+' backlog day'+(backlogInfo.days!==1?'s':'')+' available ($'+backlogInfo.dollars.toLocaleString()+') from prior months</span>':'';
+    // Color-coded bar showing $ budget consumed (vendor days booked vs entitled)
+    var dpct=entitledVdays>0?Math.min(100,Math.round(totalCount/entitledVdays*100)):0;
+    var dcls=dpct>=100?'over':dpct>=50?'close':'behind';
+    var dbarHtml=entitledVdays>0?'<div class="bp-dbar-bg"><div class="bp-dbar-fill '+dcls+'" style="width:'+dpct+'%"></div></div><div class="bp-dbar-label">'+dpct+'% of budget used ('+totalCount+' of '+entitledVdays+' vendor days)</div>':'';
     var budgetHtml=bdata.budget>0
-      ?'<div class="bp-budget"><span class="bp-budget-label">Budget &amp; Coverage</span><span class="bp-budget-val">$'+bdata.budget.toLocaleString()+'</span><span class="bp-budget-sub">'+bdata.sales.toLocaleString()+'$ sales &times; '+(bdata.pct*100).toFixed(2)+'%</span>'+vdaysHtml+evtBadge+coverageFlag+backlogHtml+'</div>'
+      ?'<div class="bp-budget"><span class="bp-budget-label">Budget &amp; Coverage</span><span class="bp-budget-val">$'+bdata.budget.toLocaleString()+'</span><span class="bp-budget-sub">'+bdata.sales.toLocaleString()+'$ sales &times; '+(bdata.pct*100).toFixed(2)+'%</span>'+vdaysHtml+evtBadge+coverageFlag+dbarHtml+backlogHtml+'</div>'
       :'<div class="bp-budget bp-budget-none">No HubSpot budget set &nbsp;'+evtBadge+backlogHtml+'</div>';
     // Build retailer list from all events this month for this brand
     var brandEvts=allEvts.filter(function(e){return e.brands.indexOf(b.key)!==-1;});
@@ -1710,6 +1780,7 @@ function renderTracker(){
     var msg=isFiltered?'No events match the current filters.':'No events scheduled for '+fmtMonthLabel(trackerDate)+'.<br>Go to <b>Field Schedule</b> to add some.';
     tbody.innerHTML='<tr><td colspan="10" class="no-events">'+msg+'</td></tr>';
     document.getElementById('tracker-summary').textContent='';
+    renderBudgetSummaryBanner();
     return;
   }
   tbody.innerHTML=sorted.map(function(e){
@@ -1731,6 +1802,7 @@ function renderTracker(){
   }).join('');
   document.getElementById('tracker-summary').textContent=
     'Showing '+sorted.length+(isFiltered?' filtered':'')+' of '+allEvts.length+' events this month';
+  renderBudgetSummaryBanner();
 }
 
 function deleteEvent(id){
