@@ -222,6 +222,8 @@ body{font-family:'Raleway',-apple-system,sans-serif;background:#F2F2F2;color:#1a
 .bp-budget-evts{display:inline-flex;align-items:center;gap:4px;margin-left:auto;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600;background:#E6DED1;color:#253022;}
 .bp-budget-flag{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600;background:#fff3cd;color:#7a5300;margin-left:4px;}
 .bp-budget-flag.flag-good{background:#d4edda;color:#1a5e2a;}
+.bp-vday-count{font-size:10px;color:#7F381D;font-weight:700;margin-left:2px;}
+.bp-backlog-badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600;background:#e6eefc;color:#1a4d8f;margin-left:4px;width:100%;margin-top:4px;}
 .tracker-section-title{font-size:13px;font-weight:700;color:#253022;margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px;}
 .btn-export{padding:6px 14px;background:#253022;color:#E6DED1;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.3px;}
 .btn-export:hover{background:#3a4a36;}
@@ -741,44 +743,165 @@ var BRAND_MINS=[
 // Brand budgets keyed by tracker month label.
 // Each month's budget is based on collections from 2 months prior
 // (e.g. June budget = April sales, July budget = May sales).
+// SOURCE: computed from live HubSpot data (DEAL pipeline 85842770, dealstage 160248221 "Shipped",
+// close_date__shipped_, brand_partner_name__dls_, marketing_budget) on 2026-07-21.
+// Brands with no marketing_budget % set in HubSpot show pct:null, budget:null (not 0) so the
+// render code can distinguish "no rate configured yet" from "rate is legitimately 0".
+// Sep 2026 budget is derived from July 2026 sales, which was PARTIAL as of 2026-07-21 (month in
+// progress) — it will self-correct next time the automation regenerates this table.
+// Regenerate monthly via the scheduled task; see automation prompt for exact query.
 const BRAND_BUDGETS_BY_MONTH={
+  "February 2026":{
+    '710 savant':{sales:0,pct:0.02,budget:0},
+    'apex solventless':{sales:384199,pct:0.0125,budget:4802},
+    'breeze canna':{sales:1073355,pct:0.005,budget:5367},
+    'bubbleman':{sales:0,pct:null,budget:null},
+    'classic roots farm':{sales:230424,pct:0.015,budget:3456},
+    'emerald canning':{sales:469892,pct:0.0125,budget:5874},
+    'exquisite extractions':{sales:0,pct:null,budget:null},
+    'farm marcellus':{sales:0,pct:0.01,budget:0},
+    'lahaze':{sales:282368,pct:0.02,budget:5647},
+    'levitate':{sales:17785,pct:null,budget:null},
+    'light sky farms':{sales:243478,pct:0.01,budget:2435},
+    'old pal':{sales:8570,pct:0.01,budget:86},
+    'peachy':{sales:162004,pct:null,budget:null},
+    'peak extracts':{sales:0,pct:0.02,budget:0},
+    'plant nerd':{sales:634276,pct:0.0125,budget:7928},
+    'potshot':{sales:33073,pct:null,budget:null},
+    'vapin ape':{sales:476810,pct:0.0075,budget:3576}
+  },
+  "March 2026":{
+    '710 savant':{sales:0,pct:0.02,budget:0},
+    'apex solventless':{sales:139828,pct:0.0125,budget:1748},
+    'breeze canna':{sales:74451,pct:0.005,budget:372},
+    'bubbleman':{sales:0,pct:null,budget:null},
+    'classic roots farm':{sales:35954,pct:0.015,budget:539},
+    'emerald canning':{sales:527810,pct:0.0125,budget:6598},
+    'exquisite extractions':{sales:0,pct:null,budget:null},
+    'farm marcellus':{sales:27301,pct:0.01,budget:273},
+    'lahaze':{sales:67409,pct:0.02,budget:1348},
+    'levitate':{sales:0,pct:null,budget:null},
+    'light sky farms':{sales:128196,pct:0.01,budget:1282},
+    'old pal':{sales:17841,pct:0.01,budget:178},
+    'peachy':{sales:106147,pct:null,budget:null},
+    'peak extracts':{sales:8816,pct:0.02,budget:176},
+    'plant nerd':{sales:104432,pct:0.0125,budget:1305},
+    'potshot':{sales:0,pct:null,budget:null},
+    'vapin ape':{sales:104589,pct:0.0075,budget:784}
+  },
+  "April 2026":{
+    '710 savant':{sales:0,pct:0.02,budget:0},
+    'apex solventless':{sales:201351,pct:0.0125,budget:2517},
+    'breeze canna':{sales:273297,pct:0.005,budget:1366},
+    'bubbleman':{sales:0,pct:null,budget:null},
+    'classic roots farm':{sales:36140,pct:0.015,budget:542},
+    'emerald canning':{sales:417162,pct:0.0125,budget:5215},
+    'exquisite extractions':{sales:0,pct:null,budget:null},
+    'farm marcellus':{sales:17815,pct:0.01,budget:178},
+    'lahaze':{sales:80736,pct:0.02,budget:1615},
+    'levitate':{sales:0,pct:null,budget:null},
+    'light sky farms':{sales:93287,pct:0.01,budget:933},
+    'old pal':{sales:43488,pct:0.01,budget:435},
+    'peachy':{sales:88970,pct:null,budget:null},
+    'peak extracts':{sales:40973,pct:0.02,budget:819},
+    'plant nerd':{sales:144615,pct:0.0125,budget:1808},
+    'potshot':{sales:0,pct:null,budget:null},
+    'vapin ape':{sales:171185,pct:0.0075,budget:1284}
+  },
+  "May 2026":{
+    '710 savant':{sales:4049,pct:0.02,budget:81},
+    'apex solventless':{sales:371414,pct:0.0125,budget:4643},
+    'breeze canna':{sales:202344,pct:0.005,budget:1012},
+    'bubbleman':{sales:5972,pct:null,budget:null},
+    'classic roots farm':{sales:88522,pct:0.015,budget:1328},
+    'emerald canning':{sales:510081,pct:0.0125,budget:6376},
+    'exquisite extractions':{sales:0,pct:null,budget:null},
+    'farm marcellus':{sales:30947,pct:0.01,budget:309},
+    'lahaze':{sales:93895,pct:0.02,budget:1878},
+    'levitate':{sales:0,pct:null,budget:null},
+    'light sky farms':{sales:184608,pct:0.01,budget:1846},
+    'old pal':{sales:48757,pct:0.01,budget:488},
+    'peachy':{sales:114274,pct:null,budget:null},
+    'peak extracts':{sales:50505,pct:0.02,budget:1010},
+    'plant nerd':{sales:209537,pct:0.0125,budget:2619},
+    'potshot':{sales:0,pct:null,budget:null},
+    'vapin ape':{sales:323739,pct:0.0075,budget:2428}
+  },
   "June 2026":{
-    '710 savant':{sales:1023,pct:0.02,budget:20},
-    'apex solventless':{sales:372513,pct:0.0125,budget:4656},
-    'breeze canna':{sales:671811,pct:0.005,budget:3359},
-    'bubbleman':{sales:3162,pct:0,budget:0},
+    '710 savant':{sales:0,pct:0.02,budget:0},
+    'apex solventless':{sales:371798,pct:0.0125,budget:4647},
+    'breeze canna':{sales:631660,pct:0.005,budget:3158},
+    'bubbleman':{sales:4995,pct:null,budget:null},
     'classic roots farm':{sales:66805,pct:0.015,budget:1002},
-    'emerald canning':{sales:535246,pct:0.0125,budget:6691},
-    'exquisite extractions':{sales:0,pct:0,budget:0},
+    'emerald canning':{sales:501256,pct:0.0125,budget:6266},
+    'exquisite extractions':{sales:0,pct:null,budget:null},
     'farm marcellus':{sales:19319,pct:0.01,budget:193},
-    'lahaze':{sales:114813,pct:0.02,budget:2296},
-    'levitate':{sales:1178,pct:0,budget:0},
+    'lahaze':{sales:103305,pct:0.02,budget:2066},
+    'levitate':{sales:1178,pct:null,budget:null},
     'light sky farms':{sales:202684,pct:0.01,budget:2027},
     'old pal':{sales:26189,pct:0.01,budget:262},
-    'peachy':{sales:104566,pct:0,budget:0},
+    'peachy':{sales:104566,pct:null,budget:null},
     'peak extracts':{sales:47191,pct:0.02,budget:944},
-    'plant nerd':{sales:228271,pct:0.0125,budget:2853},
-    'potshot':{sales:0,pct:0,budget:0},
-    'vapin ape':{sales:301648,pct:0.0075,budget:2262}
+    'plant nerd':{sales:231506,pct:0.0125,budget:2894},
+    'potshot':{sales:0,pct:null,budget:null},
+    'vapin ape':{sales:311438,pct:0.0075,budget:2336}
   },
   "July 2026":{
     '710 savant':{sales:0,pct:0.02,budget:0},
-    'apex solventless':{sales:57580,pct:0.0125,budget:720},
-    'breeze canna':{sales:55085,pct:0.005,budget:275},
-    'bubbleman':{sales:1832,pct:0,budget:0},
-    'classic roots farm':{sales:6448,pct:0.015,budget:97},
-    'emerald canning':{sales:250640,pct:0.0125,budget:3133},
-    'exquisite extractions':{sales:18612,pct:0,budget:0},
-    'farm marcellus':{sales:11470,pct:0.01,budget:115},
-    'lahaze':{sales:18898,pct:0.02,budget:378},
-    'levitate':{sales:3534,pct:0,budget:0},
-    'light sky farms':{sales:24574,pct:0.01,budget:246},
-    'old pal':{sales:11296,pct:0.01,budget:113},
-    'peachy':{sales:20796,pct:0,budget:0},
-    'peak extracts':{sales:14362,pct:0.02,budget:287},
-    'plant nerd':{sales:190438,pct:0.0125,budget:2380},
-    'potshot':{sales:0,pct:0,budget:0},
-    'vapin ape':{sales:114103,pct:0.0075,budget:856}
+    'apex solventless':{sales:264471,pct:0.0125,budget:3306},
+    'breeze canna':{sales:274975,pct:0.005,budget:1375},
+    'bubbleman':{sales:4430,pct:null,budget:null},
+    'classic roots farm':{sales:8122,pct:0.015,budget:122},
+    'emerald canning':{sales:630444,pct:0.0125,budget:7881},
+    'exquisite extractions':{sales:18612,pct:null,budget:null},
+    'farm marcellus':{sales:17893,pct:0.01,budget:179},
+    'lahaze':{sales:100358,pct:0.02,budget:2007},
+    'levitate':{sales:12822,pct:null,budget:null},
+    'light sky farms':{sales:106181,pct:0.01,budget:1062},
+    'old pal':{sales:19197,pct:0.01,budget:192},
+    'peachy':{sales:87052,pct:null,budget:null},
+    'peak extracts':{sales:22662,pct:0.02,budget:453},
+    'plant nerd':{sales:382670,pct:0.0125,budget:4783},
+    'potshot':{sales:0,pct:null,budget:null},
+    'vapin ape':{sales:276148,pct:0.0075,budget:2071}
+  },
+  "August 2026":{
+    '710 savant':{sales:0,pct:0.02,budget:0},
+    'apex solventless':{sales:355093,pct:0.0125,budget:4439},
+    'breeze canna':{sales:329030,pct:0.005,budget:1645},
+    'bubbleman':{sales:13521,pct:null,budget:null},
+    'classic roots farm':{sales:43652,pct:0.015,budget:655},
+    'emerald canning':{sales:722854,pct:0.0125,budget:9036},
+    'exquisite extractions':{sales:22076,pct:null,budget:null},
+    'farm marcellus':{sales:4340,pct:0.01,budget:43},
+    'lahaze':{sales:178251,pct:0.02,budget:3565},
+    'levitate':{sales:15503,pct:null,budget:null},
+    'light sky farms':{sales:155870,pct:0.01,budget:1559},
+    'old pal':{sales:16932,pct:0.01,budget:169},
+    'peachy':{sales:83589,pct:null,budget:null},
+    'peak extracts':{sales:21170,pct:0.02,budget:423},
+    'plant nerd':{sales:375726,pct:0.0125,budget:4697},
+    'potshot':{sales:0,pct:null,budget:null},
+    'vapin ape':{sales:432211,pct:0.0075,budget:3242}
+  },
+  "September 2026":{
+    '710 savant':{sales:0,pct:0.02,budget:0},
+    'apex solventless':{sales:256016,pct:0.0125,budget:3200},
+    'breeze canna':{sales:215716,pct:0.005,budget:1079},
+    'bubbleman':{sales:4402,pct:null,budget:null},
+    'classic roots farm':{sales:1150,pct:0.015,budget:17},
+    'emerald canning':{sales:380026,pct:0.0125,budget:4750},
+    'exquisite extractions':{sales:13176,pct:null,budget:null},
+    'farm marcellus':{sales:0,pct:0.01,budget:0},
+    'lahaze':{sales:158163,pct:0.02,budget:3163},
+    'levitate':{sales:6589,pct:null,budget:null},
+    'light sky farms':{sales:163712,pct:0.01,budget:1637},
+    'old pal':{sales:24341,pct:0.01,budget:243},
+    'peachy':{sales:58571,pct:null,budget:null},
+    'peak extracts':{sales:109851,pct:0.02,budget:2197},
+    'plant nerd':{sales:233408,pct:0.0125,budget:2918},
+    'potshot':{sales:0,pct:null,budget:null},
+    'vapin ape':{sales:232082,pct:0.0075,budget:1741}
   }
 };
 
@@ -1503,6 +1626,35 @@ function fmtTime(t){
   return h+':'+m+' '+ampm;
 }
 
+// Backlog: unused vendor-day entitlement rolls forward, but only within a rolling
+// 120-day window (roughly the last 4 months). For each qualifying PAST month (not
+// including the month currently shown, which already displays its own entitlement),
+// entitled vendor days (budget/140, floored) minus vendor days actually booked that
+// month for the brand (from loadEvents()). Only positive leftover per month counts
+// (a brand going over budget in one month doesn't create debt against other months).
+// Computed against the real current date so it stays consistent regardless of which
+// month the tracker is navigated to.
+function computeBacklogDays(brandKey){
+  var today=new Date();
+  var totalDays=0;
+  for(var i=1;i<=5;i++){
+    var d=new Date(today.getFullYear(),today.getMonth()-i,1);
+    var daysSince=Math.floor((today-d)/86400000);
+    if(daysSince>120)continue;
+    var label=fmtMonthLabel(d);
+    var mk2=monthKey(d);
+    var monthBudgets=BRAND_BUDGETS_BY_MONTH[label]||{};
+    var bdata=monthBudgets[brandKey];
+    if(!bdata||!bdata.budget)continue; // no HubSpot rate/budget set for that month
+    var entitledDays=Math.floor(bdata.budget/140);
+    if(entitledDays<=0)continue;
+    var bookedDays=loadEvents().filter(function(e){return e.month===mk2&&e.brands.indexOf(brandKey)!==-1;}).length;
+    var leftover=entitledDays-bookedDays;
+    if(leftover>0)totalDays+=leftover;
+  }
+  return {days:totalDays,dollars:totalDays*140};
+}
+
 function renderTracker(){
   var mk=monthKey(trackerDate);
   document.getElementById('tracker-month-label').textContent=fmtMonthLabel(trackerDate);
@@ -1547,9 +1699,13 @@ function renderTracker(){
     var coverageFlag='';
     if(bdata.budget>0&&totalCount===0) coverageFlag='<span class="bp-budget-flag">&#9888; No events booked</span>';
     else if(bdata.budget>0&&totalCount>0) coverageFlag='<span class="bp-budget-flag flag-good">&#10003; On the ground</span>';
+    var entitledVdays=bdata.budget>0?Math.floor(bdata.budget/140):0;
+    var vdaysHtml=bdata.budget>0?'<span class="bp-vday-count">= '+entitledVdays+' vendor day'+(entitledVdays!==1?'s':'')+' ($140/day)</span>':'';
+    var backlogInfo=computeBacklogDays(b.key);
+    var backlogHtml=backlogInfo.days>0?'<span class="bp-backlog-badge">&#8593; +'+backlogInfo.days+' backlog day'+(backlogInfo.days!==1?'s':'')+' available ($'+backlogInfo.dollars.toLocaleString()+') from prior months</span>':'';
     var budgetHtml=bdata.budget>0
-      ?'<div class="bp-budget"><span class="bp-budget-label">Budget &amp; Coverage</span><span class="bp-budget-val">$'+bdata.budget.toLocaleString()+'</span><span class="bp-budget-sub">'+bdata.sales.toLocaleString()+'$ sales &times; '+(bdata.pct*100).toFixed(2)+'%</span>'+evtBadge+coverageFlag+'</div>'
-      :'<div class="bp-budget bp-budget-none">No HubSpot budget set &nbsp;'+evtBadge+'</div>';
+      ?'<div class="bp-budget"><span class="bp-budget-label">Budget &amp; Coverage</span><span class="bp-budget-val">$'+bdata.budget.toLocaleString()+'</span><span class="bp-budget-sub">'+bdata.sales.toLocaleString()+'$ sales &times; '+(bdata.pct*100).toFixed(2)+'%</span>'+vdaysHtml+evtBadge+coverageFlag+backlogHtml+'</div>'
+      :'<div class="bp-budget bp-budget-none">No HubSpot budget set &nbsp;'+evtBadge+backlogHtml+'</div>';
     // Build retailer list from all events this month for this brand
     var brandEvts=allEvts.filter(function(e){return e.brands.indexOf(b.key)!==-1;});
     var retailerHtml=brandEvts.length===0
