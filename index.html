@@ -761,6 +761,7 @@ var BRAND_MINS=[
   {name:'Sapura',               key:'sapura',               min:1},
   {name:'Treetown',             key:'treetown',             min:3},
   {name:'Endo',                 key:'endo',                 min:2},
+  {name:'Grasshopper Farms',    key:'grasshopper farms',    min:20},
 ];
 
 // Brand budgets keyed by tracker month label.
@@ -788,7 +789,8 @@ const BRAND_BUDGETS_BY_MONTH={
     'vapin ape':{sales:476810,pct:0.0075,budget:3576},
     'sapura':{sales:0,pct:null,budget:null},
     'treetown':{sales:0,pct:null,budget:null},
-    'endo':{sales:0,pct:null,budget:null}
+    'endo':{sales:0,pct:null,budget:null},
+    'grasshopper farms':{sales:59565,pct:null,budget:null}
   },
   "March 2026":{
     'apex solventless':{sales:139828,pct:0.0125,budget:1748},
@@ -804,7 +806,8 @@ const BRAND_BUDGETS_BY_MONTH={
     'vapin ape':{sales:104589,pct:0.0075,budget:784},
     'sapura':{sales:0,pct:null,budget:null},
     'treetown':{sales:0,pct:null,budget:null},
-    'endo':{sales:0,pct:null,budget:null}
+    'endo':{sales:0,pct:null,budget:null},
+    'grasshopper farms':{sales:70606,pct:null,budget:null}
   },
   "April 2026":{
     'apex solventless':{sales:201351,pct:0.0125,budget:2517},
@@ -820,7 +823,8 @@ const BRAND_BUDGETS_BY_MONTH={
     'vapin ape':{sales:171185,pct:0.0075,budget:1284},
     'sapura':{sales:0,pct:null,budget:null},
     'treetown':{sales:0,pct:null,budget:null},
-    'endo':{sales:0,pct:null,budget:null}
+    'endo':{sales:0,pct:null,budget:null},
+    'grasshopper farms':{sales:130586,pct:null,budget:null}
   },
   "May 2026":{
     'apex solventless':{sales:371414,pct:0.0125,budget:4643},
@@ -836,7 +840,8 @@ const BRAND_BUDGETS_BY_MONTH={
     'vapin ape':{sales:323739,pct:0.0075,budget:2428},
     'sapura':{sales:0,pct:null,budget:null},
     'treetown':{sales:0,pct:null,budget:null},
-    'endo':{sales:0,pct:null,budget:null}
+    'endo':{sales:0,pct:null,budget:null},
+    'grasshopper farms':{sales:550889,pct:null,budget:null}
   },
   "June 2026":{
     'apex solventless':{sales:371798,pct:0.0125,budget:4647},
@@ -852,7 +857,8 @@ const BRAND_BUDGETS_BY_MONTH={
     'vapin ape':{sales:311438,pct:0.0075,budget:2336},
     'sapura':{sales:0,pct:null,budget:null},
     'treetown':{sales:0,pct:null,budget:null},
-    'endo':{sales:0,pct:null,budget:null}
+    'endo':{sales:0,pct:null,budget:null},
+    'grasshopper farms':{sales:359402,pct:null,budget:null}
   },
   "July 2026":{
     'apex solventless':{sales:264471,pct:0.0125,budget:3306},
@@ -868,7 +874,8 @@ const BRAND_BUDGETS_BY_MONTH={
     'vapin ape':{sales:276148,pct:0.0075,budget:2071},
     'sapura':{sales:0,pct:null,budget:null},
     'treetown':{sales:0,pct:null,budget:null},
-    'endo':{sales:0,pct:null,budget:null}
+    'endo':{sales:0,pct:null,budget:null},
+    'grasshopper farms':{sales:515402,pct:null,budget:null}
   },
   "August 2026":{
     'apex solventless':{sales:355093,pct:0.0125,budget:4439},
@@ -884,7 +891,8 @@ const BRAND_BUDGETS_BY_MONTH={
     'vapin ape':{sales:432211,pct:0.0075,budget:3242},
     'sapura':{sales:0,pct:null,budget:null},
     'treetown':{sales:8961,pct:null,budget:null},
-    'endo':{sales:0,pct:null,budget:null}
+    'endo':{sales:0,pct:null,budget:null},
+    'grasshopper farms':{sales:593750,pct:null,budget:null}
   },
   "September 2026":{
     'apex solventless':{sales:256016,pct:0.0125,budget:3200},
@@ -900,7 +908,8 @@ const BRAND_BUDGETS_BY_MONTH={
     'vapin ape':{sales:232082,pct:0.0075,budget:1741},
     'sapura':{sales:0,pct:null,budget:null},
     'treetown':{sales:19741,pct:null,budget:null},
-    'endo':{sales:0,pct:null,budget:null}
+    'endo':{sales:0,pct:null,budget:null},
+    'grasshopper farms':{sales:492464,pct:null,budget:null}
   }
 };
 
@@ -1376,6 +1385,7 @@ function showTab(id,btn){
   if(id==='tracker')renderTracker();
   if(id==='budgets')renderTracker();
   if(id==='calendar')renderCalendar();
+  renderBudgetSummaryBanner();
   // Show 90-Day Brands toggle only on Retailer View and Field Schedule
   var recentBtn=document.getElementById('btn-recent');
   if(recentBtn) recentBtn.style.display=(id==='retailer'||id==='schedule')?'':'none';
@@ -1692,7 +1702,7 @@ function renderBudgetSummaryBanner(){
   });
   banner.style.display=rows.length?'flex':'none';
   strip.innerHTML=rows.map(function(r){
-    var label=r.pct===null?'no budget set':(r.booked+'/'+r.entitled+' days');
+    var label=r.pct===null?(r.booked+' event'+(r.booked!==1?'s':'')+' booked &middot; no budget set'):(r.booked+'/'+r.entitled+' days');
     var pctLabel=r.pct===null?'':'<span class="bb-pct">'+r.pct+'%</span>';
     return '<span class="bb-pill" onclick="showTab(\'budgets\',document.querySelector(&quot;.tab-btn:nth-child(4)&quot;))" title="'+r.name+': '+label+'"><span class="bb-dot '+r.cls+'"></span>'+r.name+'&nbsp;&middot;&nbsp;'+label+' '+pctLabel+'</span>';
   }).join('');
@@ -1860,7 +1870,7 @@ function syncImport(input){
       var ids={};existing.forEach(function(ev){ids[ev.id]=true;});
       var added=0;
       incoming.forEach(function(ev){if(!ids[ev.id]){existing.push(ev);added++;}});
-      saveEvents(existing);filterAndRender();renderCalendar();
+      saveEvents(existing);filterAndRender();renderCalendar();renderBudgetSummaryBanner();
       closeSyncPanel();
       showToast('Imported '+added+' new event'+(added!==1?'s':'')+' from file');
     }catch(err){showToast('Could not read file — check it is a valid events JSON');}
