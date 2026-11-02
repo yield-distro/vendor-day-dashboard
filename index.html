@@ -768,7 +768,7 @@ var BRAND_MINS=[
 // Brand budgets keyed by tracker month label.
 // Each month's budget is based on collections from 2 months prior
 // (e.g. June budget = April sales, July budget = May sales).
-// SOURCE: computed from live HubSpot data (DEAL pipeline 85842770, dealstage 160248221 "Shipped",
+// SOURCE: computed from live HubSpot data refreshed 2026-11-02 (DEAL pipeline 85842770, dealstage 160248221 "Shipped",
 // close_date__shipped_, brand_partner_name__dls_, marketing_budget) on 2026-07-21.
 // Brands with no marketing_budget % set in HubSpot show pct:null, budget:null (not 0) so the
 // render code can distinguish "no rate configured yet" from "rate is legitimately 0".
@@ -776,23 +776,6 @@ var BRAND_MINS=[
 // progress) — it will self-correct next time the automation regenerates this table.
 // Regenerate monthly via the scheduled task; see automation prompt for exact query.
 const BRAND_BUDGETS_BY_MONTH={
-  "April 2026":{
-    'apex solventless':{sales:201351,pct:0.0125,budget:2517},
-    'bubbleman':{sales:0,pct:0.0125,budget:0},
-    'emerald canning':{sales:416341,pct:0.0125,budget:5204},
-    'exquisite extractions':{sales:0,pct:0.0125,budget:0},
-    'lahaze':{sales:80736,pct:0.02,budget:1615},
-    'light sky farms':{sales:93287,pct:0.01,budget:933},
-    'levitate':{sales:0,pct:0.0125,budget:0},
-    'peachy':{sales:88970,pct:0.0125,budget:1112},
-    'peak extracts':{sales:40973,pct:0.02,budget:819},
-    'plant nerd':{sales:144615,pct:0.0125,budget:1808},
-    'vapin ape':{sales:171185,pct:0.0075,budget:1284},
-    'sapura':{sales:3002,pct:0.0125,budget:38},
-    'treetown':{sales:0,pct:0.0125,budget:0},
-    'endo':{sales:22612,pct:0.0125,budget:283},
-    'grasshopper farms':{sales:133760,pct:0.0125,budget:1672}
-  },
   "May 2026":{
     'apex solventless':{sales:371414,pct:0.0125,budget:4643},
     'bubbleman':{sales:5972,pct:0.0125,budget:75},
@@ -881,7 +864,7 @@ const BRAND_BUDGETS_BY_MONTH={
   "October 2026":{
     'apex solventless':{sales:363333,pct:0.0125,budget:4542},
     'bubbleman':{sales:29334,pct:0.0125,budget:367},
-    'emerald canning':{sales:613357,pct:0.0125,budget:7667},
+    'emerald canning':{sales:612802,pct:0.0125,budget:7660},
     'exquisite extractions':{sales:2883,pct:0.0125,budget:36},
     'lahaze':{sales:150416,pct:0.02,budget:3008},
     'light sky farms':{sales:100601,pct:0.01,budget:1006},
@@ -911,6 +894,23 @@ const BRAND_BUDGETS_BY_MONTH={
     'treetown':{sales:48184,pct:0.0125,budget:602},
     'endo':{sales:156035,pct:0.0125,budget:1950},
     'grasshopper farms':{sales:439467,pct:0.0125,budget:5493}
+  },
+  "December 2026":{
+    'apex solventless':{sales:287709,pct:0.0125,budget:3596},
+    'bubbleman':{sales:5376,pct:0.0125,budget:67},
+    'emerald canning':{sales:553695,pct:0.0125,budget:6921},
+    'exquisite extractions':{sales:11284,pct:0.0125,budget:141},
+    'lahaze':{sales:179491,pct:0.02,budget:3590},
+    'light sky farms':{sales:59830,pct:0.01,budget:598},
+    'levitate':{sales:7852,pct:0.0125,budget:98},
+    'peachy':{sales:21467,pct:0.0125,budget:268},
+    'peak extracts':{sales:28708,pct:0.02,budget:574},
+    'plant nerd':{sales:240446,pct:0.0125,budget:3006},
+    'vapin ape':{sales:196672,pct:0.0075,budget:1475},
+    'sapura':{sales:225878,pct:0.0125,budget:2823},
+    'treetown':{sales:13683,pct:0.0125,budget:171},
+    'endo':{sales:261676,pct:0.0125,budget:3271},
+    'grasshopper farms':{sales:560377,pct:0.0125,budget:7005}
   }
 };
 
